@@ -1,0 +1,56 @@
+static void Main(string[] args)
+        {
+            int port = 8000;
+            string message = "";
+            int byteCount;
+            NetworkStream stream;
+            byte[] sendData;
+            TcpClient client;
+            string hostname;
+
+            Console.WriteLine("Please enter hostname");
+            hostname = Console.ReadLine();
+
+            try
+            {
+                Console.WriteLine($"Atempt Connection {hostname}:{port}");
+                client = new TcpClient(hostname, port);
+                Console.WriteLine("Connection Made");
+
+                try
+                {
+                    while(true)
+                    {
+                        Console.WriteLine("Please enter a Pin");
+                        int pin = int.Parse(Console.ReadLine());
+                        Console.WriteLine("Please enter a Angle");
+                        int angle = int.Parse(Console.ReadLine());
+                        message = "-{'pin': " + pin + ", 'angle': " + angle + "}";
+                        byteCount = Encoding.ASCII.GetByteCount(message);
+                        sendData = new byte[byteCount];
+                        sendData = Encoding.ASCII.GetBytes(message);
+                        stream = client.GetStream();
+                        stream.Write(sendData, 0, sendData.Length);
+
+                        if (message == "stop")
+                        {
+                            stream.Close();
+                            client.Close();
+                            break;
+                        }
+                    }
+                    
+                }
+                catch (System.NullReferenceException)
+                {
+                    Console.WriteLine("Connection Not working");
+                }
+
+                
+            }
+            catch (System.Net.Sockets.SocketException)
+            {
+                Console.WriteLine("Connection Failed");
+            }
+
+        }
